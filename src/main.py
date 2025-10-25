@@ -1,8 +1,11 @@
 from fastapi import FastAPI
 from fastapi.responses import PlainTextResponse
 from src.routers.movie_router import movie_router
+from src.utils.http_error_handler import HTTPErrorHandler
 
 app = FastAPI()
+
+app.add_middleware(HTTPErrorHandler)
 
 
 @app.get("/", tags=["Home"])
