@@ -1,12 +1,19 @@
-from fastapi import FastAPI
-from fastapi.responses import PlainTextResponse
+from fastapi import FastAPI, Request
+from fastapi.responses import PlainTextResponse, Response,  JSONResponse
 from src.routers.movie_router import movie_router
-from src.utils.http_error_handler import HTTPErrorHandler
+from fastapi import status
 
 app = FastAPI()
 
-app.add_middleware(HTTPErrorHandler)
-
+@app.middleware('http')
+async def http_error_handler(request: Request, call_next) -> Response | JSONResponse:
+    try:
+        return await call_next(request)
+    except Exception as e:
+        content = f"exc: {str(e)}"
+        status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return JSONResponse(content=content, status_code=status_code)
+    
 
 @app.get("/", tags=["Home"])
 def home():
